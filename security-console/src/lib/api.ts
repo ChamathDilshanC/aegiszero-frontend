@@ -1,4 +1,9 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
+// ?? here was a trap: it falls back only on null/undefined, so a
+// NEXT_PUBLIC_API_BASE_URL that is set but blank survived as "". Every request
+// then became a same-origin relative URL, hit this Next app instead of the
+// gateway, and came back as Next's own HTML 404 - which looks like a broken API
+// rather than a missing setting. || (with a trim) treats blank as unset.
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || "").trim() || "http://localhost:8080";
 
 const ACCESS_TOKEN_KEY = "aegiszero.accessToken";
 const REFRESH_TOKEN_KEY = "aegiszero.refreshToken";
@@ -80,6 +85,32 @@ interface ApiFetchOptions extends RequestInit {
   skipRefreshRetry?: boolean;
 }
 
+const MAX_RAW_ERROR_LENGTH = 300;
+
+/**
+ * Turns a failed response into something worth showing someone.
+ *
+ * The API returns a JSON body with a `message`, so that is what we want. What
+ * we must not do is fall back to rendering the raw body: when a request lands
+ * somewhere that is not the API - a base URL pointing at this app, or a proxy
+ * in front of it - the body is a whole HTML error document, and using it as the
+ * message dumped the entire page into the form. Reporting the status and the
+ * URL actually attempted says far more, and points straight at the base URL
+ * when that is the real problem.
+ */
+function errorMessageFrom(body: unknown, status: number, url: string): string {
+  if (typeof body === "object" && body && "message" in body) {
+    const message = String((body as { message: unknown }).message).trim();
+    if (message) return message;
+  }
+
+  const raw = typeof body === "string" ? body.trim() : "";
+  if (raw && !raw.startsWith("<") && raw.length <= MAX_RAW_ERROR_LENGTH) {
+    return raw;
+  }
+  return `HTTP ${status} from ${url} — the response was not valid API JSON.`;
+}
+
 export async function apiFetch<T = unknown>(path: string, options: ApiFetchOptions = {}): Promise<T> {
   const { skipAuth, skipRefreshRetry, headers, ...rest } = options;
 
@@ -95,7 +126,8 @@ export async function apiFetch<T = unknown>(path: string, options: ApiFetchOptio
     }
   }
 
-  const response = await fetch(`${API_BASE}${path}`, { ...rest, headers: finalHeaders });
+  const url = `${API_BASE}${path}`;
+  const response = await fetch(url, { ...rest, headers: finalHeaders });
 
   if (response.status === 401 && !skipAuth && !skipRefreshRetry) {
     const refreshed = await tryRefresh();
@@ -117,9 +149,8 @@ export async function apiFetch<T = unknown>(path: string, options: ApiFetchOptio
   const body = contentType.includes("application/json") ? await response.json() : await response.text();
 
   if (!response.ok) {
-    const message = typeof body === "object" && body && "message" in body ? String(body.message) : String(body);
     const code = typeof body === "object" && body && "error" in body ? String(body.error) : undefined;
-    throw new ApiError(response.status, message || "Request failed", code);
+    throw new ApiError(response.status, errorMessageFrom(body, response.status, url), code);
   }
 
   return body as T;
