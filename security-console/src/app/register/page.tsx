@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [requestAdminAccess, setRequestAdminAccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,7 @@ export default function RegisterPage() {
       await apiFetch("/api/auth/register", {
         method: "POST",
         skipAuth: true,
-        body: JSON.stringify({ firstName, lastName, email, password }),
+        body: JSON.stringify({ firstName, lastName, email, password, requestAdminAccess }),
       });
       setDone(true);
     } catch (err) {
@@ -37,6 +38,7 @@ export default function RegisterPage() {
       <AuthCard title="Check your email">
         <Alert kind="success">
           We sent a verification link to <strong>{email}</strong>. Open it to activate your account, then sign in.
+          {requestAdminAccess && " Your admin access request has also been sent for review."}
         </Alert>
         <Link href="/login">
           <Button className="w-full" variant="secondary">
@@ -72,7 +74,21 @@ export default function RegisterPage() {
             placeholder="At least 12 characters"
           />
         </Field>
-        <Button type="submit" className="w-full mt-2" disabled={loading}>
+        <label className="mt-3 flex items-start gap-2.5 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--background-alt)] p-3 text-sm">
+          <input
+            type="checkbox"
+            checked={requestAdminAccess}
+            onChange={(e) => setRequestAdminAccess(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-[var(--border)] accent-[var(--accent)]"
+          />
+          <span>
+            <span className="font-medium text-[var(--foreground)]">Request admin access</span>
+            <span className="block text-[var(--muted)]">
+              An administrator will review and approve this by email before it takes effect.
+            </span>
+          </span>
+        </label>
+        <Button type="submit" className="w-full mt-3" disabled={loading}>
           {loading ? "Creating account…" : "Create account"}
         </Button>
       </form>
