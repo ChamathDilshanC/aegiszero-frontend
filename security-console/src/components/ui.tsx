@@ -249,6 +249,12 @@ const NAV_ICON_PATHS: Record<string, ReactNode> = {
       <circle cx="4.5" cy="18" r="1.2" fill="currentColor" stroke="none" />
     </>
   ),
+  block: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M5.6 5.6l12.8 12.8" strokeLinecap="round" />
+    </>
+  ),
 };
 
 export function NavIcon({ name, className = "h-4.5 w-4.5" }: { name: string; className?: string }) {

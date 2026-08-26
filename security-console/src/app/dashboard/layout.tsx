@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: "/dashboard/sessions", label: "Sessions", icon: "clock" },
   { href: "/dashboard/devices", label: "Devices", icon: "device" },
   { href: "/dashboard/security", label: "Security (MFA)", icon: "lock" },
+  { href: "/dashboard/blocked-ips", label: "Blocked IPs", icon: "block", permission: "SECURITY_MANAGE" },
   { href: "/dashboard/users", label: "Users", icon: "users", permission: "USER_READ" },
   { href: "/dashboard/roles", label: "Roles & Permissions", icon: "key", permission: "ROLE_READ" },
   { href: "/dashboard/audit-logs", label: "Audit Logs", icon: "list", permission: "AUDIT_READ" },
