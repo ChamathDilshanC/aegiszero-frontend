@@ -72,19 +72,25 @@ export function Button({
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "danger" | "ghost" }) {
   const styles = {
+    // Fixed brand gradient regardless of theme - a primary action should stay
+    // recognizable in both, unlike the sidebar's active-state accent (which
+    // deliberately swaps per theme). Hover shifts the angle rather than just
+    // brightening, plus a slight scale - both called for explicitly.
     primary:
-      "bg-gradient-to-b from-[var(--accent)] to-[#12b8d4] text-[#04121a] shadow-[0_1px_0_rgba(255,255,255,0.25)_inset,0_8px_20px_-8px_rgba(34,211,238,0.55)] hover:brightness-105 active:brightness-95",
+      "bg-[linear-gradient(135deg,var(--brand-deep-blue),var(--brand-vibrant-blue))] text-white " +
+      "shadow-[0_1px_0_rgba(255,255,255,0.25)_inset,0_8px_20px_-8px_rgba(67,0,255,0.5)] " +
+      "hover:bg-[linear-gradient(135deg,var(--brand-vibrant-blue),var(--brand-cyan))] hover:scale-105 active:scale-100",
     secondary:
       "bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-hover)] hover:border-[var(--muted-soft)]/50",
     danger:
-      "bg-gradient-to-b from-[var(--danger)] to-[#e2445f] text-[#2a0a10] shadow-[0_1px_0_rgba(255,255,255,0.2)_inset,0_8px_20px_-8px_rgba(251,113,133,0.5)] hover:brightness-105 active:brightness-95",
+      "bg-gradient-to-b from-[var(--danger)] to-[#e2445f] text-white shadow-[0_1px_0_rgba(255,255,255,0.2)_inset,0_8px_20px_-8px_rgba(251,113,133,0.5)] hover:brightness-105 active:brightness-95",
     ghost: "bg-transparent text-[var(--muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)]",
   }[variant];
 
   return (
     <button
       {...rest}
-      className={`inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] px-4 py-2.5 text-sm font-medium transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 ${styles} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] px-4 py-2.5 text-sm font-medium transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 disabled:hover:brightness-100 ${styles} ${className}`}
     >
       {children}
     </button>
@@ -130,7 +136,10 @@ export function Badge({
   children: ReactNode;
 }) {
   const styles = {
-    neutral: "bg-white/[0.06] text-[var(--muted)] ring-1 ring-inset ring-white/[0.06]",
+    // 10%-opacity brand-color background, per the design spec - dark mode
+    // pairs it with vibrant (accent-colored) text, light mode with plain
+    // dark text, since a light tint under light text would have no contrast.
+    neutral: "bg-[var(--accent-soft)] text-[var(--foreground)] dark:text-[var(--accent)] ring-1 ring-inset ring-[var(--accent)]/15",
     success: "bg-[var(--success-soft)] text-[var(--success)] ring-1 ring-inset ring-[var(--success)]/20",
     warning: "bg-[var(--warning-soft)] text-[var(--warning)] ring-1 ring-inset ring-[var(--warning)]/20",
     danger: "bg-[var(--danger-soft)] text-[var(--danger)] ring-1 ring-inset ring-[var(--danger)]/20",
@@ -183,7 +192,7 @@ export function IdentityChip({ label, sublabel }: { label: string; sublabel?: st
   const initial = label.trim().charAt(0).toUpperCase() || "?";
   return (
     <div className="flex items-center gap-3">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)]/25 to-[var(--accent-2)]/25 text-sm font-semibold text-[var(--accent)] ring-1 ring-inset ring-white/[0.06]">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)]/25 to-[var(--accent-2)]/25 text-sm font-semibold text-[var(--accent)] ring-1 ring-inset ring-[var(--border)]">
         {initial}
       </span>
       <div className="min-w-0">

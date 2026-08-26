@@ -1,9 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, type Variants } from "framer-motion";
 import { apiFetch, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { Card, Button, TextInput, Field, Alert, Badge, Spinner } from "@/components/ui";
+
+// Stagger: the parent fires this on its children in DOM order (60ms apart);
+// each child just needs its own from/to. Keying cards by role.id means an
+// existing card never replays this on a data refresh - React keeps the same
+// DOM node - so only a genuinely new role card (create) plays the entrance.
+const CARD_GRID_VARIANTS: Variants = {
+  visible: { transition: { staggerChildren: 0.06 } },
+};
+const CARD_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
+};
 
 interface RoleResponse {
   id: string;
@@ -226,9 +239,24 @@ export default function RolesPage() {
             <Spinner /> Loading roles…
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
+          <motion.div
+            className="grid gap-4 md:grid-cols-2"
+            initial="hidden"
+            animate="visible"
+            variants={CARD_GRID_VARIANTS}
+          >
             {roles.map((role) => (
-              <div key={role.id} className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--background-alt)] p-4">
+              <motion.div
+                key={role.id}
+                variants={CARD_VARIANTS}
+                whileHover={{ y: -4 }}
+                transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                className={
+                  "rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--background-alt)] p-4 " +
+                  "shadow-[var(--shadow-card)] transition-shadow duration-200 " +
+                  "hover:border-[var(--brand-cyan)]/60 hover:shadow-[0_0_0_1px_var(--brand-cyan),0_12px_32px_-10px_rgba(0,202,255,0.35)]"
+                }
+              >
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <h2 className="font-semibold">{role.name}</h2>
                   {role.systemRole && <Badge tone="neutral">System</Badge>}
@@ -286,9 +314,9 @@ export default function RolesPage() {
                     )}
                   </>
                 )}
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </Card>
 
