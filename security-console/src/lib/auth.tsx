@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { clearTokens, decodeToken, getAccessToken, isAuthenticated as hasToken } from "@/lib/api";
+import { apiLogout, decodeToken, getAccessToken, isAuthenticated as hasToken } from "@/lib/api";
 
 interface AuthUser {
   userId: string;
@@ -16,7 +16,7 @@ interface AuthContextValue {
   hasPermission: (permission: string) => boolean;
   hasRole: (role: string) => boolean;
   refreshFromToken: () => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -44,8 +44,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshFromToken = () => setUser(readUserFromToken());
 
-  const logout = () => {
-    clearTokens();
+  const logout = async () => {
+    await apiLogout();
     setUser(null);
   };
 

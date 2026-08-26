@@ -39,6 +39,30 @@ export function clearTokens() {
   window.localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
+/**
+ * The actual sign-out call: revokes the refresh token server-side via
+ * POST /api/auth/logout, then clears local storage regardless of whether
+ * that call succeeded. Best-effort by design - the user is leaving the app
+ * either way, and a token that could not be revoked (network blip, already
+ * expired) still expires on its own via REFRESH_TOKEN_TTL_DAYS. A failed
+ * revoke must never block the button from working.
+ */
+export async function apiLogout(): Promise<void> {
+  const refreshToken = getRefreshToken();
+  if (refreshToken) {
+    try {
+      await apiFetch("/api/auth/logout", {
+        method: "POST",
+        body: JSON.stringify({ refreshToken }),
+        skipRefreshRetry: true,
+      });
+    } catch {
+      // see comment above - intentionally swallowed
+    }
+  }
+  clearTokens();
+}
+
 export function isAuthenticated(): boolean {
   return getAccessToken() !== null;
 }

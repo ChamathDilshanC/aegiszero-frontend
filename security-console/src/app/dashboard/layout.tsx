@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { useAuth, useRequireAuth } from "@/lib/auth";
-import { clearTokens } from "@/lib/api";
 import { ShieldIcon, NavIcon, IdentityChip } from "@/components/ui";
 
 const NAV_ITEMS = [
@@ -66,15 +65,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   useRequireAuth();
   const pathname = usePathname();
   const router = useRouter();
-  const { user, hasPermission, loading } = useAuth();
+  const { user, hasPermission, loading, logout } = useAuth();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     setMobileNavOpen(false);
   }, [pathname]);
 
-  function handleLogout() {
-    clearTokens();
+  async function handleLogout() {
+    await logout();
     router.push("/login");
   }
 

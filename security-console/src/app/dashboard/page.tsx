@@ -46,7 +46,7 @@ export default function OverviewPage() {
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatTile label="Active sessions" value={sessions.length} />
         <StatTile label="Known devices" value={devices.length} />
-        <StatTile label="MFA methods enabled" value={mfa?.methods.length ?? 0} />
+        <StatTile label="MFA methods enabled" value={mfa?.methods?.length ?? 0} />
         <StatTile label="Your roles" value={user?.roles.length ?? 0} />
       </div>
 
