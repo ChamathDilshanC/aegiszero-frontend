@@ -99,9 +99,22 @@ const MAX_RAW_ERROR_LENGTH = 300;
  * when that is the real problem.
  */
 function errorMessageFrom(body: unknown, status: number, url: string): string {
-  if (typeof body === "object" && body && "message" in body) {
-    const message = String((body as { message: unknown }).message).trim();
-    if (message) return message;
+  if (typeof body === "object" && body !== null) {
+    const record = body as Record<string, unknown>;
+
+    if (typeof record.message === "string" && record.message.trim()) {
+      return record.message.trim();
+    }
+
+    // Real JSON, just not our API's shape - the gateway's own unhandled-error
+    // body is {timestamp,path,status,error,requestId}, no "message" field.
+    // That is not "invalid API JSON"; it is a different, still meaningful,
+    // error. Reporting it beats a canned "wasn't JSON" that isn't true.
+    if (typeof record.error === "string" && record.error.trim()) {
+      return `${record.error} (HTTP ${status} from ${url})`;
+    }
+
+    return `HTTP ${status} from ${url}: ${JSON.stringify(body).slice(0, MAX_RAW_ERROR_LENGTH)}`;
   }
 
   const raw = typeof body === "string" ? body.trim() : "";
