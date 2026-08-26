@@ -187,7 +187,7 @@ export default function RolesPage() {
   }
 
   return (
-    <div className="max-w-4xl space-y-6">
+    <div className="max-w-7xl space-y-6">
       <div>
         <h1 className="text-xl font-semibold">Roles &amp; permissions</h1>
         <p className="text-sm text-[var(--muted)]">The platform&apos;s access control model.</p>
@@ -240,7 +240,7 @@ export default function RolesPage() {
           </div>
         ) : (
           <motion.div
-            className="grid gap-4 md:grid-cols-2"
+            className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
             initial="hidden"
             animate="visible"
             variants={CARD_GRID_VARIANTS}
