@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { apiFetch, ApiError } from "@/lib/api";
 import { Card, TextInput, Alert, Badge, Spinner } from "@/components/ui";
 
@@ -67,9 +68,11 @@ export default function UsersPage() {
               </thead>
               <tbody className="divide-y divide-[var(--border)]">
                 {data.content.map((u) => (
-                  <tr key={u.id}>
+                  <tr key={u.id} className="transition-colors hover:bg-[var(--surface-hover)]">
                     <td className="py-2.5 pr-4">
-                      {u.firstName} {u.lastName}
+                      <Link href={`/dashboard/users/${u.id}`} className="hover:text-[var(--accent)] hover:underline">
+                        {u.firstName} {u.lastName}
+                      </Link>
                     </td>
                     <td className="py-2.5 pr-4 text-[var(--muted)]">{u.email}</td>
                     <td className="py-2.5 pr-4">

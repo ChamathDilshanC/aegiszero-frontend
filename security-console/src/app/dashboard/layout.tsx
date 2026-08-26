@@ -8,6 +8,7 @@ import { ShieldIcon, NavIcon, IdentityChip } from "@/components/ui";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Overview", icon: "grid" },
+  { href: "/dashboard/profile", label: "Profile", icon: "user" },
   { href: "/dashboard/sessions", label: "Sessions", icon: "clock" },
   { href: "/dashboard/devices", label: "Devices", icon: "device" },
   { href: "/dashboard/security", label: "Security (MFA)", icon: "lock" },

@@ -229,6 +229,12 @@ const NAV_ICON_PATHS: Record<string, ReactNode> = {
       <path d="M16 14.6c2.6.5 4.5 2.2 5 5.4" strokeLinecap="round" />
     </>
   ),
+  user: (
+    <>
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M4.5 20c1-4.2 4-6.5 7.5-6.5s6.5 2.3 7.5 6.5" strokeLinecap="round" />
+    </>
+  ),
   key: (
     <>
       <circle cx="8" cy="15.5" r="4" />
